@@ -11,6 +11,9 @@
 import pandas as pd
 import sqlite3
 
+import tensorflow as tf
+import tensorflow_hub as hub
+
 
 conn = sqlite3.connect("scan.db")
 df = pd.read_sql_query("""
@@ -18,8 +21,15 @@ df = pd.read_sql_query("""
                         LEFT JOIN linkpaths l ON p.linkID = l.linkID
                         LEFT JOIN domains d ON l.domainID = d.domainID
                         """, conn)
+conn.close()
 
-# Verify that result of SQL query is stored in the dataframe
 print(df.head())
 
-conn.close()
+# @param ["https://tfhub.dev/google/universal-sentence-encoder/4", "https://tfhub.dev/google/universal-sentence-encoder-large/5"]
+USE_module_url = "https://tfhub.dev/google/universal-sentence-encoder/4"
+model = hub.load(USE_module_url)
+print("USE module %s loaded" % USE_module_url)
+
+
+def embed(input):
+    return model(input)
